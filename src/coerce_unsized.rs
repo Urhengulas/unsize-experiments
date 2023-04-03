@@ -7,7 +7,6 @@ use alloc::boxed::Box;
 use alloc::sync::Arc;
 
 use crate::unsize::{ConstUnsize, StableUnsize, Unsize};
-use crate::TypedMetadata;
 
 /// Trait that indicates that this is a pointer or a wrapper for one,
 /// where unsizing can be performed on the pointee.
@@ -223,15 +222,5 @@ impl<T: ?Sized + StableUnsize<U>, U: ?Sized> CoerceUnsized<Arc<U>> for Arc<T> {
                 Unsize::target_metadata(ptr),
             ))
         }
-    }
-}
-
-impl<T, U> CoerceUnsized<TypedMetadata<U>> for TypedMetadata<T>
-where
-    T: ?Sized + ConstUnsize<U>,
-    U: ?Sized,
-{
-    fn coerce_unsized(self) -> TypedMetadata<U> {
-        TypedMetadata(T::TARGET_METADATA)
     }
 }

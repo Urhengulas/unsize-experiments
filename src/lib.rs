@@ -11,13 +11,17 @@
 
 extern crate alloc;
 
-pub mod coerce_unsized;
-pub mod dispatch_from_dyn;
-pub mod pointer;
-pub mod unsize;
+mod coerce_unsized;
+mod dispatch_from_dyn;
+mod pointer;
+mod unsize;
 
-// https://github.com/rust-lang/rust/pull/97052
-struct TypedMetadata<T: ?Sized>(pub <T as core::ptr::Pointee>::Metadata);
+pub use crate::{
+    coerce_unsized::CoerceUnsized,
+    dispatch_from_dyn::DispatchFromDyn,
+    pointer::Pointer,
+    unsize::{ConstUnsize, StableUnsize, Unsize},
+};
 
 #[cfg(test)]
 mod tests {
@@ -180,6 +184,19 @@ mod tests {
 
     #[test]
     fn coerce_type_metadata() {
+        // https://github.com/rust-lang/rust/pull/97052
+        struct TypedMetadata<T: ?Sized>(pub <T as core::ptr::Pointee>::Metadata);
+
+        impl<T, U> CoerceUnsized<TypedMetadata<U>> for TypedMetadata<T>
+        where
+            T: ?Sized + ConstUnsize<U>,
+            U: ?Sized,
+        {
+            fn coerce_unsized(self) -> TypedMetadata<U> {
+                TypedMetadata(T::TARGET_METADATA)
+            }
+        }
+
         struct Struct;
         trait Trait {}
 
