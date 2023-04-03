@@ -8,7 +8,7 @@ impl Trait for str {
     fn dispatch_me(&self) {}
 }
 
-unsafe impl unsizing_experiments::unsize::ConstUnsize<dyn Trait> for str {
+unsafe impl unsizing_experiments::ConstUnsize<dyn Trait> for str {
     const TARGET_METADATA: <dyn Trait as core::ptr::Pointee>::Metadata = unimplemented!();
 }
 
