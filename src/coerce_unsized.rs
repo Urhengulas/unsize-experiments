@@ -58,7 +58,11 @@ pub trait CoerceUnsized<Target> {
  */
 
 // &mut T -> &mut U
-impl<'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<&'a mut U> for &'a mut T {
+impl<'a, T, U> CoerceUnsized<&'a mut U> for &'a mut T
+where
+    T: ?Sized + Unsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> &'a mut U {
         // SAFETY: the returned fat pointer must be valid according to [`Unsize`]
         unsafe {
@@ -73,7 +77,12 @@ impl<'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<&'a mut U> for &'a mut 
 }
 
 // &mut T -> &U
-impl<'a, 'b: 'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<&'a U> for &'b mut T {
+impl<'a, 'b, T, U> CoerceUnsized<&'a U> for &'b mut T
+where
+    'b: 'a,
+    T: ?Sized + Unsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> &'a U {
         // SAFETY: the returned fat pointer must be valid according to [`Unsize`]
         unsafe {
@@ -88,7 +97,11 @@ impl<'a, 'b: 'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<&'a U> for &'b 
 }
 
 // &mut T -> *mut U
-impl<'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<*mut U> for &'a mut T {
+impl<'a, T, U> CoerceUnsized<*mut U> for &'a mut T
+where
+    T: ?Sized + Unsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> *mut U {
         ptr::from_raw_parts_mut(
             // SAFETY: self is a reference
@@ -100,7 +113,11 @@ impl<'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<*mut U> for &'a mut T {
 }
 
 // &mut T -> *const U
-impl<'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<*const U> for &'a mut T {
+impl<'a, T, U> CoerceUnsized<*const U> for &'a mut T
+where
+    T: ?Sized + Unsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> *const U {
         ptr::from_raw_parts(
             // SAFETY: self is a reference
@@ -112,7 +129,12 @@ impl<'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<*const U> for &'a mut T
 }
 
 // &T -> &U
-impl<'a, 'b: 'a, T: Unsize<U> + ?Sized, U: ?Sized> CoerceUnsized<&'a U> for &'b T {
+impl<'a, 'b, T, U> CoerceUnsized<&'a U> for &'b T
+where
+    'b: 'a,
+    T: Unsize<U> + ?Sized,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> &'a U {
         // SAFETY: the returned fat pointer must be valid according to [`Unsize`]
         unsafe {
@@ -127,7 +149,11 @@ impl<'a, 'b: 'a, T: Unsize<U> + ?Sized, U: ?Sized> CoerceUnsized<&'a U> for &'b 
 }
 
 // &T -> *const U
-impl<'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<*const U> for &'a T {
+impl<'a, T, U> CoerceUnsized<*const U> for &'a T
+where
+    T: ?Sized + Unsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> *const U {
         ptr::from_raw_parts(
             // SAFETY: self is a reference
@@ -140,7 +166,11 @@ impl<'a, T: ?Sized + Unsize<U>, U: ?Sized> CoerceUnsized<*const U> for &'a T {
 
 // *mut T -> *mut U
 // Note the use of ConstUnsize! We can't deref the pointer as we do not know whether it is live
-impl<T: ?Sized + ConstUnsize<U>, U: ?Sized> CoerceUnsized<*mut U> for *mut T {
+impl<T, U> CoerceUnsized<*mut U> for *mut T
+where
+    T: ?Sized + ConstUnsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> *mut U {
         ptr::from_raw_parts_mut(self.cast(), <T as ConstUnsize<U>>::TARGET_METADATA)
     }
@@ -148,7 +178,11 @@ impl<T: ?Sized + ConstUnsize<U>, U: ?Sized> CoerceUnsized<*mut U> for *mut T {
 
 // *mut T -> *const U
 // Note the use of ConstUnsize! We can't deref the pointer as we do not know whether it is live
-impl<T: ?Sized + ConstUnsize<U>, U: ?Sized> CoerceUnsized<*const U> for *mut T {
+impl<T, U> CoerceUnsized<*const U> for *mut T
+where
+    T: ?Sized + ConstUnsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> *const U {
         ptr::from_raw_parts(self.cast(), <T as ConstUnsize<U>>::TARGET_METADATA)
     }
@@ -156,7 +190,11 @@ impl<T: ?Sized + ConstUnsize<U>, U: ?Sized> CoerceUnsized<*const U> for *mut T {
 
 // *const T -> *const U
 // Note the use of ConstUnsize! We can't deref the pointer as we do not know whether it is live
-impl<T: ?Sized + ConstUnsize<U>, U: ?Sized> CoerceUnsized<*const U> for *const T {
+impl<T, U> CoerceUnsized<*const U> for *const T
+where
+    T: ?Sized + ConstUnsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> *const U {
         ptr::from_raw_parts(self.cast(), <T as ConstUnsize<U>>::TARGET_METADATA)
     }
@@ -168,7 +206,12 @@ impl<T: ?Sized + ConstUnsize<U>, U: ?Sized> CoerceUnsized<*const U> for *const T
 
 // Box<T> -> Box<U>
 // Note the use of StableUnsize! unstable unsize would be unsound as arc relies on the data pointer pointing inside of the ArcInner.
-impl<T: ?Sized + StableUnsize<U>, U: ?Sized, A: Allocator> CoerceUnsized<Box<U, A>> for Box<T, A> {
+impl<T, U, A> CoerceUnsized<Box<U, A>> for Box<T, A>
+where
+    T: ?Sized + StableUnsize<U>,
+    U: ?Sized,
+    A: Allocator,
+{
     fn coerce_unsized(self) -> Box<U, A> {
         let (this, a) = Box::into_raw_with_allocator(self);
         // SAFETY: According to [`StableUnsize`] the metadata is associated with our pointer
@@ -204,14 +247,21 @@ where
     }
 }
 
-impl<T: CoerceUnsized<U>, U> CoerceUnsized<Cell<U>> for Cell<T> {
+impl<T, U> CoerceUnsized<Cell<U>> for Cell<T>
+where
+    T: CoerceUnsized<U>,
+{
     fn coerce_unsized(self) -> Cell<U> {
         Cell::new(self.into_inner().coerce_unsized())
     }
 }
 
 // Note the use of StableUnsize! unstable unsize would be unsound as arc relies on the data pointer pointing inside of the ArcInner.
-impl<T: ?Sized + StableUnsize<U>, U: ?Sized> CoerceUnsized<Arc<U>> for Arc<T> {
+impl<T, U> CoerceUnsized<Arc<U>> for Arc<T>
+where
+    T: ?Sized + StableUnsize<U>,
+    U: ?Sized,
+{
     fn coerce_unsized(self) -> Arc<U> {
         let ptr = Arc::into_raw(self);
         // SAFETY: The arc is safe to be constructed as the pointer is unchanged
