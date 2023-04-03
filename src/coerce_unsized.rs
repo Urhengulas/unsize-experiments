@@ -8,6 +8,7 @@ use alloc::sync::Arc;
 
 use crate::unsize::{ConstUnsize, StableUnsize, Unsize};
 use crate::TypedMetadata;
+
 /// Trait that indicates that this is a pointer or a wrapper for one,
 /// where unsizing can be performed on the pointee.
 ///
@@ -37,7 +38,7 @@ use crate::TypedMetadata;
 /// pointers. It is implemented automatically by the compiler.
 ///
 /// [dst-coerce]: https://github.com/rust-lang/rfcs/blob/master/text/0982-dst-coercion.md
-/// [unsize]: crate::marker::Unsize
+/// [unsize]: crate::unsize::Unsize
 /// [nomicon-coerce]: ../../nomicon/coercions.html
 // std has a `Target:?Sized` bound for some reason, but it's technically not required for any coercions,
 // since Target is supposed to be a pointer or wrapper to a pointer

@@ -24,7 +24,7 @@ use core::ptr::Pointee;
 /// - The implementation of [`Unsize::target_metadata`] must return metadata that is valid for
 /// the object pointed to by the output of [`Unsize::target_data_address`].
 ///
-/// [`ops::CoerceUnsized`]: crate::ops::CoerceUnsized
+/// [`ops::CoerceUnsized`]: crate::coerce_unsized::CoerceUnsized
 /// [`Rc`]: ../../std/rc/struct.Rc.html
 /// [RFC982]: https://github.com/rust-lang/rfcs/blob/master/text/0982-dst-coercion.md
 /// [nomicon-coerce]: ../../nomicon/coercions.html
@@ -51,7 +51,7 @@ where
 ///
 /// - The implementation of [`StableUnsize::target_metadata`] must return metadata that is valid for
 /// the object pointed to by the `self` parameter
-/// - The implementing type and [`Target`] must be layout compatible.
+/// - The implementing type and `Target` must be layout compatible.
 pub unsafe trait StableUnsize<Target>: Unsize<Target>
 where
     // ideally this would be !Sized
@@ -68,8 +68,8 @@ where
 /// # Safety
 ///
 /// - The implementation of [`ConstUnsize::TARGET_METADATA`] must return metadata that is valid for
-/// any object that represents the [`Target`] type.
-/// - The implementing type and [`Target`] must be layout compatible.
+/// any object that represents the `Target` type.
+/// - The implementing type and `Target` must be layout compatible.
 pub unsafe trait ConstUnsize<Target>: StableUnsize<Target>
 where
     // ideally this would be !Sized
